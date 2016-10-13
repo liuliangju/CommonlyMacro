@@ -1,0 +1,15 @@
+//
+//  CommonlyMacro-Prefix.pch
+//  CommonlyMacro
+//
+//  Created by liangju on 10/13/16.
+//  Copyright © 2016 liangju. All rights reserved.
+//
+
+#ifndef CommonlyMacro_Prefix_pch
+#define CommonlyMacro_Prefix_pch
+
+#import "LJCommonHeaders.h"
+
+
+#endif /* CommonlyMacro_Prefix_pch */

@@ -1,0 +1,93 @@
+//
+//  UIViewController+HUD.m
+//  boc_ios
+//
+//  Created by liangju on 9/29/16.
+//  Copyright © 2016 北京软虹科技有限公司. All rights reserved.
+//
+
+#import "UIViewController+HUD.h"
+#import "MBProgressHUD.h"
+#import <objc/runtime.h>
+
+static const void *HttpRequestHUDKey = &HttpRequestHUDKey;
+static const CGFloat kCornerRadius = 4.0f;                  // 圆角大小
+#define kBgColor RGBACOLOR(0, 0, 0, 1)                // 背景颜色
+
+@implementation UIViewController (HUD)
+
+- (MBProgressHUD *)HUD{
+    return objc_getAssociatedObject(self, HttpRequestHUDKey);
+}
+
+- (void)setHUD:(MBProgressHUD *)HUD {
+    objc_setAssociatedObject(self, HttpRequestHUDKey, HUD, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)showHudInView:(UIView *)view hint:(NSString *)hint {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:view];
+        hud.cornerRadius = kCornerRadius;
+        hud.color = kBgColor;
+        hud.labelText = hint;
+        [view addSubview:hud];
+        [hud show:YES];
+        [self setHUD:hud];
+    });
+}
+
+- (void)showHudInView:(UIView *)view hint:(NSString *)hint dimBackGround:(BOOL)dimBackground {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:view];
+        hud.cornerRadius = kCornerRadius;
+        hud.color = kBgColor;
+        hud.labelText = hint;
+        if (dimBackground) {
+            hud.dimBackground = YES;
+        }
+        [view addSubview:hud];
+        [hud show:YES];
+        [self setHUD:hud];
+    });
+}
+
+- (void)showHint:(NSString *)hint {
+    [LJTools showHint:hint];
+}
+
+- (void)showHint:(NSString *)hint yOffset:(float)yOffset {
+    [LJTools showHint:hint yOffset:yOffset];
+}
+
+- (void)hideHud {
+    [[self HUD] hide:YES];
+}
+
+- (void)showHintInView:(UIView *)view hint:(NSString *)hint {
+    MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:view];
+    hud.cornerRadius = kCornerRadius;
+    hud.mode = MBProgressHUDModeText;
+    hud.color = kBgColor;
+    hud.labelText = hint;
+    [view addSubview:hud];
+    hud.removeFromSuperViewOnHide = YES;
+    [hud show:YES];
+    [hud hide:YES afterDelay:1];
+}
+
+- (void)showProgress:(UIView *)view hint:(NSString *)hint progress:(float)progress {
+    MBProgressHUD * HUD = [[MBProgressHUD alloc] initWithView:self.view];
+    [view addSubview:HUD];
+    HUD.labelText = hint != nil ? hint : @"正在加载";
+    HUD.mode = MBProgressHUDModeAnnularDeterminate;
+    [HUD showAnimated:YES whileExecutingBlock:^{
+        HUD.progress = progress;
+        usleep(50000);
+    } completionBlock:^{
+        [HUD removeFromSuperview];
+    }];
+}
+
+
+
+@end
